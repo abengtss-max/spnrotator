@@ -26,31 +26,17 @@ $AcrUrl = "<URL of ACR>"
 $app = Get-AzADServicePrincipal -SearchString "spnrotator"
 
 # fetch application id
-$appId = $app.ApplicationId
+$appId = $app.AppId
 
 # Removes the existing secrets from registered application
-Remove-AzADAppCredential -ApplicationId $app.ApplicationId -Force
-
-# Creates a new random secret for the registered application
-$charlist = [char]94..[char]126 + [char]65..[char]90 +  [char]47..[char]57
-$pwlength = Get-Random -Minimum 32 -Maximum 47 
-$pwdList = @()
-For ($i = 0; $i -lt $pwlength; $i++) {
-   $pwdList += $charList | Get-Random
-
-}
-
-$password = -join $pwdList
-
-#convert string to secure strings.
-$secureAppPassword = $Password | ConvertTo-SecureString -AsPlainText -Force
+Remove-AzADAppCredential -ApplicationId $app.AppId
 
 # Lets generate a the time for the spn to be valid for, in this example we will take the current time and add one day to it.
 # we only want the spn to be short lived.
 $appEndDate = (get-date).AddDays(1) | get-date -Format "yyyy-MM-dd"
 
 # Lets create a new SPN secret which is only valid for 24 hours.
-New-AzADAppCredential -ApplicationId $app.ApplicationId  -Password $secureAppPassword -EndDate $appEndDate
+New-AzADAppCredential -ApplicationId $app.ApplId -EndDate $appEndDate
 
 function Set-AzureDevopServiceEndPointUpdate {
 
